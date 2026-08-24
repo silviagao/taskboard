@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Board">
+<meta name="theme-color" content="#F6F3EC">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%20%22TaskBoard%20%E7%9C%8B%E6%9D%BF%22%2C%20%22short_name%22%3A%20%22Board%22%2C%20%22description%22%3A%20%22%E4%BB%A5%E4%BB%BB%E5%8A%A1%E6%9D%A1%E7%9B%AE%E4%B8%BA%E7%BA%BF%E7%B4%A2%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%E8%BF%BD%E8%B8%AA%E7%9C%8B%E6%9D%BF%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22orientation%22%3A%20%22portrait%22%2C%20%22background_color%22%3A%20%22%23F6F3EC%22%2C%20%22theme_color%22%3A%20%22%23F6F3EC%22%2C%20%22start_url%22%3A%20%22.%22%2C%20%22icons%22%3A%20%5B%7B%22src%22%3A%20%22data%3Aimage/svg%2Bxml%2C%253Csvg%2520xmlns%253D%2522http%253A//www.w3.org/2000/svg%2522%2520viewBox%253D%25220%25200%2520512%2520512%2522%253E%253Crect%2520width%253D%2522512%2522%2520height%253D%2522512%2522%2520rx%253D%2522112%2522%2520fill%253D%2522%2523F6F3EC%2522/%253E%253Ccircle%2520cx%253D%2522256%2522%2520cy%253D%2522256%2522%2520r%253D%2522132%2522%2520fill%253D%2522none%2522%2520stroke%253D%2522%2523A88B6A%2522%2520stroke-width%253D%252230%2522/%253E%253Cpath%2520d%253D%2522M196%2520268%2520l44%252044%2520l84%2520-104%2522%2520fill%253D%2522none%2522%2520stroke%253D%2522%2523A88B6A%2522%2520stroke-width%253D%252230%2522%2520stroke-linecap%253D%2522round%2522%2520stroke-linejoin%253D%2522round%2522/%253E%253C/svg%253E%22%2C%20%22sizes%22%3A%20%22any%22%2C%20%22type%22%3A%20%22image/svg%2Bxml%22%2C%20%22purpose%22%3A%20%22any%22%7D%5D%7D">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%22112%22%20fill%3D%22%23F6F3EC%22/%3E%3Ccircle%20cx%3D%22256%22%20cy%3D%22256%22%20r%3D%22132%22%20fill%3D%22none%22%20stroke%3D%22%23A88B6A%22%20stroke-width%3D%2230%22/%3E%3Cpath%20d%3D%22M196%20268%20l44%2044%20l84%20-104%22%20fill%3D%22none%22%20stroke%3D%22%23A88B6A%22%20stroke-width%3D%2230%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E">
+<title>TaskBoard 看板</title>
+<style>
+  :root{
+    --paper:#F6F3EC; --card:#FCFAF5; --ink:#3B3733; --muted:#9A9388;
+    --line:#E7E1D5; --accent:#A88B6A;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Helvetica Neue","Hiragino Sans GB","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--paper);color:var(--ink);
+    padding:calc(env(safe-area-inset-top) + 22px) 20px calc(env(safe-area-inset-bottom) + 40px);
+    line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1100px;margin:0 auto}
+  header{margin-bottom:18px}
+  h1{font-size:21px;font-weight:600;letter-spacing:.04em;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;letter-spacing:.02em}
+  .stats{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;
+    padding:5px 12px;font-size:12.5px;display:inline-flex;align-items:center;gap:6px;color:#5a544c}
+  .chip i{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+  .filters button{border:1px solid var(--line);background:var(--card);border-radius:999px;
+    padding:6px 13px;font-size:13px;cursor:pointer;color:#5a544c;font-family:inherit;transition:.15s}
+  .filters button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .cat{margin-top:26px}
+  .cat-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;
+    padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .cat-h h2{font-size:15px;font-weight:600;letter-spacing:.05em;margin:0;color:#4a443d}
+  .cat-h .cnt{font-size:12px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px}
+  .card-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .eid{font-weight:700;font-size:12px;color:var(--muted);letter-spacing:.03em}
+  .kind{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 7px}
+  .badge{color:#fff;font-size:11.5px;border-radius:6px;padding:2px 9px;letter-spacing:.02em}
+  .pri{margin-left:auto;font-size:11px;color:var(--muted)}
+  .etitle{font-size:15px;font-weight:600;margin:2px 0 12px;line-height:1.45}
+  .bar{height:6px;background:#EDE8DD;border-radius:999px;overflow:hidden}
+  .bar-fill{height:100%;background:linear-gradient(90deg,#B08968,#8FA37B)}
+  .barmeta{font-size:11.5px;color:var(--muted);margin:5px 0 12px}
+  .step{border-top:1px dashed var(--line);padding:9px 0}
+  .step-head{display:flex;align-items:center;gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .step-title{font-weight:600;font-size:13.5px;flex:1}
+  .plan{font-size:12.5px;color:#5a544c;margin-top:4px;line-height:1.55}
+  .out{font-size:12.5px;color:#6b6359;margin-top:4px;line-height:1.55}
+  .fb{font-size:12px;color:#9A7B9E;margin-top:3px}
+  .thread{margin-top:9px;font-size:12.5px}
+  .thread summary{cursor:pointer;color:var(--muted);font-size:12px;letter-spacing:.02em}
+  .msg{border-radius:9px;padding:7px 11px;margin-top:6px;line-height:1.55;font-size:12.5px}
+  .msg .who{font-weight:700;margin-right:6px}
+  .msg.me{background:#EFEBE2}
+  .msg.bot{background:#F3F0E8}
+  .msg.more{color:var(--muted);background:transparent;font-style:italic}
+  .empty{color:var(--muted);padding:40px;text-align:center;border:1px dashed var(--line);border-radius:12px;font-size:13px}
+  .hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 14px);
+    background:var(--ink);color:#fff;font-size:12.5px;padding:9px 16px;border-radius:999px;
+    box-shadow:0 4px 16px rgba(0,0,0,.18);z-index:9;max-width:90vw;text-align:center;display:none}
+  .hint b{color:#E9C46A;font-weight:600}
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:12px;line-height:1.7}
+  footer code{background:#EDE8DD;padding:1px 6px;border-radius:5px;font-size:11.5px;color:#5a544c}
+  #gate{position:fixed;inset:0;background:var(--paper);z-index:50;display:flex;align-items:center;justify-content:center;padding:24px}
+  #gate.gone{display:none}
+  .gate-box{width:100%;max-width:320px;text-align:center}
+  .gate-title{font-size:22px;font-weight:600;letter-spacing:.06em;color:var(--ink)}
+  .gate-sub{color:var(--muted);font-size:13px;margin:6px 0 20px}
+  #gate-in{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:15px;background:var(--card);color:var(--ink);font-family:inherit}
+  #gate-btn{margin-top:12px;width:100%;padding:12px;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:15px;cursor:pointer;font-family:inherit}
+  #gate-err{color:#B5564E;font-size:12.5px;margin-top:10px;min-height:16px}
+  @media (max-width:560px){.grid{grid-template-columns:1fr}.wrap{padding:0}}
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-title">TaskBoard</div>
+    <div class="gate-sub">请输入查看口令</div>
+    <input id="gate-in" type="password" placeholder="口令" autocomplete="off">
+    <button id="gate-btn">查看看板</button>
+    <div id="gate-err"></div>
+  </div>
+</div>
+<div class="wrap">
+  <header>
+    <h1>TaskBoard 看板</h1>
+    <div class="sub">以任务条目为线索 · 每步产出后暂停等你确认 · 更新于 2026-08-25 07:17</div>
+  </header>
+  <div class="stats" id="stats"></div>
+  <div class="filters" id="filters">
+    <button data-f="all" class="on">全部</button>
+    <button data-f="review">待我确认</button>
+    <button data-f="in_progress">执行中</button>
+    <button data-f="paused">已暂停</button>
+    <button data-f="done">已完成</button>
+    <button data-f="backlog">已登记</button>
+  </div>
+  <div id="board"></div>
+  <footer>
+    本看板为<b>只读视图</b>。推进条目请在对话中给我留言（如 <code>P-001 通过</code> / <code>new idea 你的想法</code> / <code>board</code> 刷新），我更新数据并重渲染本页。<br>
+    手机体验：用浏览器打开此页 → 「添加到主屏幕」→ 以独立 App 全屏打开。
+  </footer>
+</div>
+<div class="hint" id="hint">📲 手机浏览器打开后，点「分享 → 添加到主屏幕」即可全屏使用</div>
+<script>
+  const GATE_HASH = "d7b9e8ef4ad4cf80db8aaef2a1f3d213c415180dd57f55f2974706178aca310d";
+  async function sha256(s){const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+  if(GATE_HASH){
+    const g=document.getElementById('gate'),inp=document.getElementById('gate-in'),btn=document.getElementById('gate-btn'),err=document.getElementById('gate-err');
+    document.querySelector('.wrap').style.visibility='hidden';
+    document.body.style.overflow='hidden';
+    if(localStorage.getItem('tb_pass_ok')==='1'){g.classList.add('gone');document.querySelector('.wrap').style.visibility='visible';document.body.style.overflow='';}
+    async function chk(){const v=inp.value.trim();if(!v){err.textContent='请输入口令';return;}const h=await sha256(v);if(h===GATE_HASH){localStorage.setItem('tb_pass_ok','1');g.classList.add('gone');document.querySelector('.wrap').style.visibility='visible';document.body.style.overflow='';}else{err.textContent='口令不正确';}}
+    btn.addEventListener('click',chk);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')chk();});
+  } else {
+    document.getElementById('gate').classList.add('gone');
+  }
+  const BOARD = {"version": 1, "schema": {"entry_status": ["backlog", "planning", "in_progress", "review", "paused", "done", "archived"], "step_status": ["pending", "active", "review", "done", "revised"], "kind": ["project", "idea"]}, "updated": "2026-08-25T03:55:00+12:00", "entries": {"P-001": {"id": "P-001", "kind": "project", "category": "虚拟工具开发", "title": "【示例种子】儿童身高预测工具 · 内容矩阵（小红书+抖音）", "status": "review", "priority": "P2", "tags": ["副业", "育儿", "内容"], "created": "2026-08-25T03:55:00+12:00", "updated": "2026-08-25T03:55:00+12:00", "steps": [{"id": "S1", "title": "需求拆解与内容主线界定", "status": "done", "plan": "明确内容矩阵目标：缓解家长身高焦虑 + 科学避坑。确定 3 条内容线：科普 debunk、工具使用教程、真实案例。明确免责声明红线（非医疗诊断）。", "output": "已界定 3 条内容主线 + 免责声明模板，见 messages。", "feedback": ""}, {"id": "S2", "title": "小红书首篇图文大纲 + 文案", "status": "review", "plan": "产出第 1 篇小红书图文：选题《孩子矮不矮，别被骨龄吓到》+ 5 屏大纲 + 标题备选 3 个 + 正文 300 字 + 标签。语气：亲切、科学、不制造焦虑。", "output": "标题备选：①孩子矮不矮，别被骨龄吓到 ②90%家长忽略的身高真相 ③测了骨龄先别慌｜CPA妈妈讲清楚。正文与 5 屏结构已生成（演示用，待你确认）。", "feedback": ""}], "messages": [{"ts": "2026-08-25T03:55:00+12:00", "from": "user", "text": "（示例）启动这个项目的内容矩阵。"}, {"ts": "2026-08-25T03:55:00+12:00", "from": "agent", "text": "已生成 S1 需求拆解并产出 S2 小红书首篇大纲，当前停在 review 等待你确认。"}]}}};
+  const CAT_ORDER = ["AI 时代增强影响力", "搞钱创业", "虚拟工具开发", "AI 技能 / 搜索 / 开发锻炼", "个人事务", "未分组"];
+  const STATUS = {"backlog": ["#B7B0A4", "已登记"], "planning": ["#8FA3A8", "方案拆解"], "in_progress": ["#B08968", "执行中"], "review": ["#C9A24B", "待你确认"], "paused": ["#9C968C", "已暂停"], "done": ["#8FA37B", "已完成"], "archived": ["#D2CCBF", "已归档"]};
+  const KIND = {"project": "项目", "idea": "想法", "metric": "指标", "alert": "预警", "milestone": "里程碑", "reference": "参考"};
+  const esc = s => (s==null?"":String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const catOf = e => e.category || "未分组";
+
+  function stepProgress(steps){
+    const total=steps.length, done=steps.filter(s=>s.status==='done').length;
+    return [done,total];
+  }
+  function card(eid,e){
+    const [sc,sn]=STATUS[e.status]||['#B7B0A4',e.status];
+    const kind=KIND[e.kind]||e.kind||'';
+    const steps=(e.steps||[]).map((s,i)=>{
+      const [c,l]=STATUS[s.status]||['#D2CCBF',s.status];
+      const fb=s.feedback?`<div class="fb">↳ 反馈：${esc(s.feedback)}</div>`:'';
+      return `<div class="step">
+        <div class="step-head"><span class="dot" style="background:${c}"></span>
+        <span class="step-title">${i+1}. ${esc(s.title)}</span>
+        <span class="badge" style="background:${c}">${esc(l)}</span></div>
+        <div class="plan">方案：${esc(s.plan)}</div>
+        <div class="out">产出：${esc(s.output)}</div>${fb}</div>`;
+    }).join('');
+    const [d,t]=stepProgress(e.steps||[]);
+    const pct=t?Math.round(100*d/t):0;
+    const msgs=(e.messages||[]);
+    const mh=msgs.slice(-8).map(m=>{
+      const who=m.from==='user'?'你':'智多宝';
+      const cls=m.from==='user'?'me':'bot';
+      return `<div class="msg ${cls}"><span class="who">${esc(who)}</span>${esc(m.text)}</div>`;
+    }).join('');
+    const more=msgs.length>8?`<div class="msg more">… 另有 ${msgs.length-8} 条更早留言</div>`:'';
+    const pri=e.priority?`<span class="pri">${esc(e.priority)}</span>`:'<span class="pri"></span>';
+    return `<div class="card" data-status="${esc(e.status)}">
+      <div class="card-top"><span class="eid">${esc(eid)}</span>
+      <span class="kind">${esc(kind)}</span>
+      <span class="badge" style="background:${sc}">${esc(sn)}</span>${pri}</div>
+      <div class="etitle">${esc(e.title)}</div>
+      <div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="barmeta">步骤进度 ${d}/${t}</div>
+      <div class="steps">${steps}</div>
+      <details class="thread"><summary>留言线程 (${msgs.length})</summary>${more}${mh}</details>
+    </div>`;
+  }
+  function render(){
+    const entries=BOARD.entries||{};
+    const list=Object.entries(entries);
+    // stats
+    const st={};
+    let proj=0,idea=0;
+    list.forEach(([k,e])=>{st[e.status]=(st[e.status]||0)+1;
+      if(e.kind==='project')proj++;else if(e.kind==='idea')idea++;});
+    let chips='';
+    for(const [s,[c,l]] of Object.entries(STATUS)){
+      if(catsHasStatus(s)) chips+=`<span class="chip"><i style="background:${c}"></i>${l} ${st[s]||0}</span>`;
+    }
+    chips+=`<span class="chip">共 ${list.length} 条（项目 ${proj} / 想法 ${idea}）</span>`;
+    document.getElementById('stats').innerHTML=chips;
+    // grouped board
+    const groups={};
+    list.forEach(([k,e])=>{const c=catOf(e);(groups[c]=groups[c]||[]).push([k,e]);});
+    const order=CAT_ORDER.filter(c=>groups[c]).concat(Object.keys(groups).filter(c=>!CAT_ORDER.includes(c)));
+    let html='';
+    if(!list.length){html=`<div class="empty">暂无条目。给我留言：<code>new project 你的标题</code></div>`;}
+    order.forEach(c=>{
+      const items=groups[c];
+      html+=`<section class="cat"><div class="cat-h"><h2>${esc(c)}</h2><span class="cnt">${items.length} 条</span></div>
+        <div class="grid">${items.map(([k,e])=>card(k,e)).join('')}</div></section>`;
+    });
+    document.getElementById('board').innerHTML=html;
+  }
+  function catsHasStatus(s){return Object.values(BOARD.entries||{}).some(e=>e.status===s);}
+  // filter
+  const f=document.getElementById('filters');
+  f.addEventListener('click',ev=>{
+    if(ev.target.tagName!=='BUTTON')return;
+    [...f.children].forEach(b=>b.classList.remove('on'));
+    ev.target.classList.add('on');
+    const v=ev.target.dataset.f;
+    document.querySelectorAll('.card').forEach(c=>{
+      c.style.display=(v==='all'||c.dataset.status===v)?'':'none';
+    });
+    document.querySelectorAll('.cat').forEach(sec=>{
+      const vis=[...sec.querySelectorAll('.card')].some(c=>c.style.display!=='none');
+      sec.style.display=vis?'':'none';
+    });
+  });
+  render();
+  // mobile add-to-home hint
+  if(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) && !localStorage.getItem('tb_hint')){
+    const h=document.getElementById('hint');h.style.display='block';
+    setTimeout(()=>{h.style.display='none';localStorage.setItem('tb_hint','1');},6000);
+  }
+</script>
+</body></html>
